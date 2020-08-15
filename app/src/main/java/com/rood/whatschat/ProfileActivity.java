@@ -23,11 +23,17 @@ import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Picasso;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.HashMap;
+
 public class ProfileActivity extends AppCompatActivity {
 
     private DatabaseReference mUsersDatabase;
     private DatabaseReference mFriendReqDatabase;
     private DatabaseReference mFriendDatabase;
+    private DatabaseReference mNotificationDatabase;
     private StorageReference mStorage;
     private FirebaseUser mAuth;
 
@@ -37,6 +43,8 @@ public class ProfileActivity extends AppCompatActivity {
     private TextView mStatus;
     private Button mSendFriendReqBtn;
     private Button mDeclineReqBtn;
+    DateFormat dateFormat;
+    Calendar calendar;
 
     String current_state;
 
@@ -50,7 +58,13 @@ public class ProfileActivity extends AppCompatActivity {
         mUsersDatabase = FirebaseDatabase.getInstance().getReference().child("Users");
         mFriendReqDatabase = FirebaseDatabase.getInstance().getReference().child("Friend_req");
         mFriendDatabase = FirebaseDatabase.getInstance().getReference().child("Friend");
+        mNotificationDatabase = FirebaseDatabase.getInstance().getReference().child("Notifications");
         //mStorage = FirebaseStorage.getInstance().getReference().child("profile_image");
+
+        dateFormat = new SimpleDateFormat("dd/MM/yy HH:mm:ss");
+        calendar = Calendar.getInstance();
+
+        //String dateTime = calendar.getTime().toString();
 
         mProfileImage = findViewById(R.id.profile_image);
         mDisplayName = findViewById(R.id.profile_display_name);
@@ -78,7 +92,7 @@ public class ProfileActivity extends AppCompatActivity {
                 // REQUEST TYPE NOT EXISTS
                 if (!snapshot.child(mAuth.getUid()).child(user_id).child("request_type").exists()){
 
-                    // 2 possibilities, either both are friends or are not.
+                    // 2 possibilities, either both are FRIEND or NOT FRIEND.
                     mFriendDatabase.addValueEventListener(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -145,6 +159,13 @@ public class ProfileActivity extends AppCompatActivity {
                     mFriendReqDatabase.child(user_id).child(mAuth.getUid()).child("request_type").setValue("received");
                     mDeclineReqBtn.setVisibility(View.INVISIBLE);
 
+                    // CREATE NOTIFICATION IN FIREBASE
+                    HashMap<String, String> notifMap = new HashMap<>();
+                    notifMap.put("type", "request");
+                    notifMap.put("from", mAuth.getUid());
+
+                    mNotificationDatabase.child(user_id).push().setValue(notifMap);
+
                 }
 
                 if (current_state.equals("request sent")) {
@@ -156,7 +177,7 @@ public class ProfileActivity extends AppCompatActivity {
 
                 if (current_state.equals("request received")){
 
-                    String time = FieldValue.serverTimestamp().toString();
+                    String time = calendar.getTime().toString();
 
                     // Add Friend
                     mFriendDatabase.child(mAuth.getUid()).child(user_id).setValue(time);
