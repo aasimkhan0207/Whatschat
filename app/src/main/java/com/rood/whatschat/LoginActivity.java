@@ -12,12 +12,17 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.iid.InstanceIdResult;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -26,6 +31,7 @@ public class LoginActivity extends AppCompatActivity {
     private Button loginBtn;
 
     private FirebaseAuth mAuth;
+    private DatabaseReference mUsersDatabase;
     private MaterialToolbar topAppBar;
 
     private ProgressDialog pd;
@@ -46,6 +52,8 @@ public class LoginActivity extends AppCompatActivity {
         setSupportActionBar(topAppBar);
         getSupportActionBar().setTitle("Login");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true); // for back to parent activity
+
+        mUsersDatabase = FirebaseDatabase.getInstance().getReference().child("Users");
 
         //topAppBar.setTitle("Login");
 
@@ -70,6 +78,16 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if (task.isSuccessful()) {
+
+                    // Get DEVICE TOKEN ID (here one ID for one account ie. ONLY One Device will have ID NO-MULTI-DEVICE) and Store in User (Firebase)
+                    FirebaseInstanceId.getInstance().getInstanceId().addOnSuccessListener(new OnSuccessListener<InstanceIdResult>() {
+                        @Override
+                        public void onSuccess(InstanceIdResult instanceIdResult) {
+                            String deviceTokenId = instanceIdResult.getToken();
+                            mUsersDatabase.child(mAuth.getUid()).child("device_token").setValue(deviceTokenId);
+                        }
+                    });
+
                     // Sign in success, update UI with the signed-in user's information
                     Log.d("LOGIN", "signInWithEmail:success");
 

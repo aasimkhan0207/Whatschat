@@ -13,6 +13,7 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.textfield.TextInputEditText;
@@ -22,6 +23,8 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.iid.InstanceIdResult;
 
 import java.util.HashMap;
 
@@ -91,11 +94,23 @@ public class RegisterActivity extends AppCompatActivity {
 
                     dbref = FirebaseDatabase.getInstance().getReference().child("Users").child(uid);
 
-                    HashMap<String, String> userMap = new HashMap<>();
+
+
+                    final HashMap<String, String> userMap = new HashMap<>();
                     userMap.put("name", display_name);
                     userMap.put("status", "Hey there! I am using Whatschat.");
                     userMap.put("image", "default");
                     userMap.put("thumb_image", "default");
+
+                    // Device TOKEN
+                    FirebaseInstanceId.getInstance().getInstanceId().addOnSuccessListener(new OnSuccessListener<InstanceIdResult>() {
+                        @Override
+                        public void onSuccess(InstanceIdResult instanceIdResult) {
+                            String deviceTokenId = instanceIdResult.getToken();
+                            userMap.put("device_token", deviceTokenId);
+                        }
+                    });
+
 
                     dbref.setValue(userMap).addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override

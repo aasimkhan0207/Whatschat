@@ -43,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
         topAppBar = findViewById(R.id.topAppBar);
 
         // populate top app bar
-        topAppBar.setTitle("Chats");
+        topAppBar.setTitle("Whatschat");
         topAppBar.setNavigationIcon(R.drawable.ic_menu);
 
         // to place menu menu we need to set SupportActionBar and implement onCreateOptionsMenu

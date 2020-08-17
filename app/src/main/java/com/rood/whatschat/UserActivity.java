@@ -31,6 +31,7 @@ public class UserActivity extends AppCompatActivity {
 
     private MaterialToolbar topAppbar;
     private RecyclerView mUsersList;
+
     private FirebaseRecyclerAdapter adapter;
 
     @Override
@@ -130,38 +131,40 @@ public class UserActivity extends AppCompatActivity {
             // SET ADAPTER
         mUsersList.setAdapter(adapter);
         };
-    }
 
-// ViewHolder Class
-class UserViewHolder extends RecyclerView.ViewHolder{
+    // ViewHolder Class
+    public static class UserViewHolder extends RecyclerView.ViewHolder{
 
-    public LinearLayout root; // for item onclick or set
+        public LinearLayout root; // for item onclick or set
 
-    public TextView nameView;
-    public TextView statusView;
-    public ImageView imageView;
-    public CircleImageView thumbView;
+        public TextView nameView;
+        public TextView statusView;
+        public ImageView imageView;
+        public CircleImageView thumbView;
 
-    public UserViewHolder(@NonNull View itemView) {
-        super(itemView);
+        public UserViewHolder(@NonNull View itemView) {
+            super(itemView);
 
-        root = itemView.findViewById(R.id.user_single_root);
-        nameView = itemView.findViewById(R.id.user_single_name);
-        statusView = itemView.findViewById(R.id.user_single_status);
-        //imageView = itemView.findViewById(R.id.user_single_image);
-        thumbView = itemView.findViewById(R.id.user_single_image);
+            root = itemView.findViewById(R.id.user_single_root);
+            nameView = itemView.findViewById(R.id.user_single_name);
+            statusView = itemView.findViewById(R.id.user_single_status);
+            //imageView = itemView.findViewById(R.id.user_single_image);
+            thumbView = itemView.findViewById(R.id.user_single_image);
 
-    }
+        }
 
-    public void setNameView(String s){
-        nameView.setText(s);
-    }
+        public void setNameView(String s){
+            nameView.setText(s);
+        }
 
-    public void setStatusView(String s) {
-        statusView.setText(s);
-    }
+        public void setStatusView(String s) {
+            statusView.setText(s);
+        }
 
-    public void setThumbView(String s){
-        Picasso.get().load(s).into(thumbView);
+        public void setThumbView(String s){
+            Picasso.get().load(s).into(thumbView);
+        }
     }
 }
+
+

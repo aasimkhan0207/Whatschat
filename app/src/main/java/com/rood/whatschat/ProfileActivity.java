@@ -1,6 +1,7 @@
 package com.rood.whatschat;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
@@ -27,6 +28,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.Map;
 
 public class ProfileActivity extends AppCompatActivity {
 
@@ -157,6 +159,24 @@ public class ProfileActivity extends AppCompatActivity {
 
                     mFriendReqDatabase.child(mAuth.getUid()).child(user_id).child("request_type").setValue("sent");
                     mFriendReqDatabase.child(user_id).child(mAuth.getUid()).child("request_type").setValue("received");
+
+
+                    // 2nd Method
+                    /*
+                    Map reqestMap = new HashMap();
+
+                    reqestMap.put(mAuth.getUid() + "/" + user_id + "request_type", "sent");
+                    reqestMap.put(user_id + "/" + mAuth.getUid() + "request_type", "received");
+
+                    mFriendDatabase.updateChildren(reqestMap, new DatabaseReference.CompletionListener() {
+                        @Override
+                        public void onComplete(@Nullable DatabaseError error, @NonNull DatabaseReference ref) {
+                            //
+                        }
+                    });
+
+                     */
+
                     mDeclineReqBtn.setVisibility(View.INVISIBLE);
 
                     // CREATE NOTIFICATION IN FIREBASE
@@ -180,8 +200,8 @@ public class ProfileActivity extends AppCompatActivity {
                     String time = calendar.getTime().toString();
 
                     // Add Friend
-                    mFriendDatabase.child(mAuth.getUid()).child(user_id).setValue(time);
-                    mFriendDatabase.child(user_id).child(mAuth.getUid()).setValue(time);
+                    mFriendDatabase.child(mAuth.getUid()).child(user_id).child("date").setValue(time);
+                    mFriendDatabase.child(user_id).child(mAuth.getUid()).child("date").setValue(time);
 
                     // Removed Requests
                     mFriendReqDatabase.child(mAuth.getUid()).child(user_id).removeValue();
