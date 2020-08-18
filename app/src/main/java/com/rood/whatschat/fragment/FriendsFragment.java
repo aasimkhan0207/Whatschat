@@ -1,5 +1,6 @@
 package com.rood.whatschat.fragment;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 
@@ -16,10 +17,12 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.firebase.ui.database.SnapshotParser;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -28,6 +31,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.rood.whatschat.ChatActivity;
 import com.rood.whatschat.ProfileActivity;
 import com.rood.whatschat.R;
 import com.rood.whatschat.UserActivity;
@@ -41,10 +45,9 @@ import de.hdodenhof.circleimageview.CircleImageView;
 public class FriendsFragment extends Fragment {
 
     private FirebaseAuth mAuth;
-
+    private DatabaseReference mUsersDatabase;
     private View mMainView;
     private RecyclerView mFriendsList;
-
     private FirebaseRecyclerAdapter adapter;
 
 
@@ -63,6 +66,8 @@ public class FriendsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         mAuth = FirebaseAuth.getInstance();
+        mUsersDatabase = FirebaseDatabase.getInstance().getReference().child("Users");
+
 
         // FRAGMENT VIEW
         mMainView = inflater.inflate(R.layout.fragment_friends, container, false);
@@ -109,9 +114,7 @@ public class FriendsFragment extends Fragment {
                 holder.setDateView(model.getDate());
 
                 // SET NAME AND IMAGE
-                String user_id = getRef(position).getKey();
-
-
+                final String user_id = getRef(position).getKey();
 
                 users_ref.child(user_id).addValueEventListener(new ValueEventListener() {
                     @Override
@@ -123,7 +126,6 @@ public class FriendsFragment extends Fragment {
                         holder.setNameView(friend_name);
                         holder.setImageView(friend_thumb);
 
-
                     }
 
                     @Override
@@ -132,11 +134,73 @@ public class FriendsFragment extends Fragment {
                     }
                 });
 
+                // Friend ONCLICK
+                holder.root.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Log.i("CLICKED",user_id);
+
+                        CharSequence[] options = {"Profile, Chat"};
+
+                        MaterialAlertDialogBuilder dialogBuilder = new MaterialAlertDialogBuilder(getContext());
+
+                        dialogBuilder.setTitle("Select Option");
+
+                        dialogBuilder.setNegativeButton("Profile", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                sendToProfile(user_id);
+                            }
+                        });
+
+                        dialogBuilder.setPositiveButton("Chat", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                Intent chatIntent = new Intent(getContext(), ChatActivity.class);
+                                chatIntent.putExtra("user_id", user_id);
+                                startActivity(chatIntent);
+                            }
+                        });
+
+                        dialogBuilder.show();
+                    }
+                });
+
             }
         };
 
-
         mFriendsList.setAdapter(adapter);
+    }
+
+    private void sendToProfile(final String user_id) {
+
+        String user_name = null;
+        String user_status = null;
+        String user_dp_url = null;
+
+        mUsersDatabase.child(user_id).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                String user_name = snapshot.child("name").getValue().toString();
+                String user_status = snapshot.child("status").getValue().toString();
+                String user_dp_url = snapshot.child("thumb_image").getValue().toString();
+
+                Intent profileIntent = new Intent(getContext(), ProfileActivity.class);
+                profileIntent.putExtra("user_id",user_id);
+                profileIntent.putExtra("user_name",user_name);
+                profileIntent.putExtra("user_status", user_status);
+                profileIntent.putExtra("user_dp_url", user_dp_url);
+
+                startActivity(profileIntent);
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
     }
 
     @Override
@@ -145,6 +209,11 @@ public class FriendsFragment extends Fragment {
         adapter.startListening();
     }
 
+    @Override
+    public void onStop() {
+        super.onStop();
+        adapter.stopListening();
+    }
 
     // ViewHolder Class
     public static class FriendViewHolder extends RecyclerView.ViewHolder{
