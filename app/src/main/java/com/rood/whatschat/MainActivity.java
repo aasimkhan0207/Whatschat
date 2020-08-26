@@ -51,17 +51,17 @@ public class MainActivity extends AppCompatActivity {
 
 
         // Tabs Titles
-        String[] titles = new String[]{"Movies", "Events", "Tickets"};
 
-        // set ViewPager2 view
+        // set VIEW-PAGER2 view
         mainViewPager = findViewById(R.id.main_tabPager);
-        // set TabLayout(material) view
+
+        // set TAB-LAYOUT(material) view
         tabLayout = findViewById(R.id.main_tabLayout);
 
-        // create PagerAdapter Object
+        // create PAGER-ADAPTER Object
         pagerAdapter = new SectionsPagerAdapter(this);
 
-        // SET PagerAdapter ie. bind to ViewPager
+        // Set PagerADAPTER ie. bind to ViewPager
         mainViewPager.setAdapter(pagerAdapter);
 
         // TabLayoutMediator bind TabLayout & ViewPager2

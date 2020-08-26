@@ -1,11 +1,13 @@
 package com.rood.whatschat.fragment;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -23,6 +25,7 @@ import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.firebase.ui.database.SnapshotParser;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.android.material.dialog.MaterialDialogs;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -138,14 +141,32 @@ public class FriendsFragment extends Fragment {
                 holder.root.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        Log.i("CLICKED",user_id);
 
-                        CharSequence[] options = {"Profile, Chat"};
+                        CharSequence options[] = new CharSequence[]{"Open Profile", "Send message"};
 
                         MaterialAlertDialogBuilder dialogBuilder = new MaterialAlertDialogBuilder(getContext());
 
-                        dialogBuilder.setTitle("Select Option");
+                        dialogBuilder.setItems(options, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                switch (i){
+                                    case 0:
+                                        sendToProfile(user_id);
+                                        break;
 
+                                    case 1:
+                                        Intent chatIntent = new Intent(getContext(), ChatActivity.class);
+                                        chatIntent.putExtra("user_id", user_id);
+                                        startActivity(chatIntent);
+                                }
+                            }
+                        });
+
+                        dialogBuilder.create();
+
+                        dialogBuilder.show();
+
+                        /*
                         dialogBuilder.setNegativeButton("Profile", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
@@ -163,6 +184,11 @@ public class FriendsFragment extends Fragment {
                         });
 
                         dialogBuilder.show();
+                        */
+
+
+
+
                     }
                 });
 

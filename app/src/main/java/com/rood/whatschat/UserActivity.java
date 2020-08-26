@@ -19,6 +19,7 @@ import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.firebase.ui.database.SnapshotParser;
 import com.google.android.material.appbar.MaterialToolbar;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
@@ -33,11 +34,17 @@ public class UserActivity extends AppCompatActivity {
     private RecyclerView mUsersList;
 
     private FirebaseRecyclerAdapter adapter;
+    private FirebaseAuth mAuth;
+    private String currentUserId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user);
+
+        mAuth = FirebaseAuth.getInstance();
+
+        currentUserId = mAuth.getUid();
 
         // App Bar
         topAppbar = findViewById(R.id.topAppBar);
@@ -100,10 +107,6 @@ public class UserActivity extends AppCompatActivity {
             @Override
             protected void onBindViewHolder(@NonNull UserViewHolder holder, final int position, @NonNull User model) {
 
-                holder.setNameView(model.getName());
-                holder.setStatusView(model.getStatus());
-                //holder.setImageView(model.getImage());
-                holder.setThumbView(model.getThumb_image());
 
                 // Get key of item
                 final String user_id = getRef(position).getKey();
@@ -111,19 +114,32 @@ public class UserActivity extends AppCompatActivity {
                 final String user_dp_url = model.getImage();
                 final String user_name = model.getName();
 
-                holder.root.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
+                if (user_id.equals(currentUserId)){
+                    holder.root.setVisibility(View.GONE);
+                }
 
-                        Intent profileIntent = new Intent(UserActivity.this, ProfileActivity.class);
-                        profileIntent.putExtra("user_id",user_id);
-                        profileIntent.putExtra("user_name",user_name);
-                        profileIntent.putExtra("user_status", user_status);
-                        profileIntent.putExtra("user_dp_url", user_dp_url);
-                        startActivity(profileIntent);
+                else {
+                    holder.setNameView(model.getName());
+                    holder.setStatusView(model.getStatus());
+                    //holder.setImageView(model.getImage());
+                    holder.setThumbView(model.getThumb_image());
 
-                    }
-                });
+                    holder.root.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+
+                            Intent profileIntent = new Intent(UserActivity.this, ProfileActivity.class);
+                            profileIntent.putExtra("user_id",user_id);
+                            profileIntent.putExtra("user_name",user_name);
+                            profileIntent.putExtra("user_status", user_status);
+                            profileIntent.putExtra("user_dp_url", user_dp_url);
+                            startActivity(profileIntent);
+
+                        }
+                    });
+                }
+
+
             }
 
             };
