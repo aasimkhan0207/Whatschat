@@ -3,13 +3,13 @@ package com.rood.whatschat.model;
 public class Message {
 
     private String message;
-    private String time;
+    private long time;
     private String from;
 
     public Message() {
     }
 
-    public Message(String message, String time, String from) {
+    public Message(String message, long time, String from) {
         this.message = message;
         this.time = time;
         this.from = from;
@@ -23,11 +23,11 @@ public class Message {
         this.message = message;
     }
 
-    public String getTime() {
+    public long getTime() {
         return time;
     }
 
-    public void setTime(String time) {
+    public void setTime(long time) {
         this.time = time;
     }
 

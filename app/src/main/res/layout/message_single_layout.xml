@@ -5,13 +5,13 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="10dp">
+    android:padding="5dp">
 
 
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/message_single_profile"
-        android:layout_width="64dp"
-        android:layout_height="64dp"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:layout_marginTop="5dp"
         android:src="@drawable/harry"
         app:layout_constraintStart_toStartOf="parent"
@@ -23,12 +23,12 @@
         android:layout_height="wrap_content"
         android:maxWidth="200dp"
         android:layout_marginStart="10dp"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="0dp"
         android:background="@drawable/message_text_bg"
-        android:padding="10dp"
+        android:padding="8dp"
         android:text="Hi there!"
         android:textColor="#FFFFFF"
-        android:textSize="18sp"
+        android:textSize="16sp"
         app:layout_constraintStart_toEndOf="@+id/message_single_profile"
         app:layout_constraintTop_toTopOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

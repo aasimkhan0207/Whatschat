@@ -24,6 +24,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.rood.whatschat.model.User;
+import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -114,39 +115,36 @@ public class UserActivity extends AppCompatActivity {
                 final String user_dp_url = model.getImage();
                 final String user_name = model.getName();
 
-                if (user_id.equals(currentUserId)){
-                    holder.root.setVisibility(View.GONE);
-                }
+//                if (user_id.equals(currentUserId)){
+//                    holder.root.setVisibility(View.GONE);
+//                }
 
-                else {
-                    holder.setNameView(model.getName());
-                    holder.setStatusView(model.getStatus());
-                    //holder.setImageView(model.getImage());
-                    holder.setThumbView(model.getThumb_image());
 
-                    holder.root.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
+                holder.setNameView(model.getName());
+                holder.setStatusView(model.getStatus());
+                //holder.setImageView(model.getImage());
+                holder.setThumbView(model.getThumb_image());
 
-                            Intent profileIntent = new Intent(UserActivity.this, ProfileActivity.class);
-                            profileIntent.putExtra("user_id",user_id);
-                            profileIntent.putExtra("user_name",user_name);
-                            profileIntent.putExtra("user_status", user_status);
-                            profileIntent.putExtra("user_dp_url", user_dp_url);
-                            startActivity(profileIntent);
+                holder.root.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
 
-                        }
-                    });
-                }
+                        Intent profileIntent = new Intent(UserActivity.this, ProfileActivity.class);
+                        profileIntent.putExtra("user_id",user_id);
+                        profileIntent.putExtra("user_name",user_name);
+                        profileIntent.putExtra("user_status", user_status);
+                        profileIntent.putExtra("user_dp_url", user_dp_url);
+                        startActivity(profileIntent);
 
+                    }
+                });
 
             }
 
-            };
-
-            // SET ADAPTER
-        mUsersList.setAdapter(adapter);
         };
+        // SET ADAPTER
+        mUsersList.setAdapter(adapter);
+    };
 
     // ViewHolder Class
     public static class UserViewHolder extends RecyclerView.ViewHolder{
@@ -178,7 +176,7 @@ public class UserActivity extends AppCompatActivity {
         }
 
         public void setThumbView(String s){
-            Picasso.get().load(s).into(thumbView);
+            Picasso.get().load(s).placeholder(R.drawable.harry).networkPolicy(NetworkPolicy.OFFLINE).into(thumbView);
         }
     }
 }

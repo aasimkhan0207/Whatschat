@@ -15,6 +15,7 @@ import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -22,11 +23,13 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.storage.StorageReference;
+import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -82,7 +85,7 @@ public class ProfileActivity extends AppCompatActivity {
 
         mDisplayName.setText(user_name);
         mStatus.setText(user_status);
-        Picasso.get().load(user_dp_url).into(mProfileImage);
+        Picasso.get().load(user_dp_url).placeholder(R.drawable.harry).networkPolicy(NetworkPolicy.OFFLINE).into(mProfileImage);
 
         current_state = "not friend";
 
@@ -160,23 +163,6 @@ public class ProfileActivity extends AppCompatActivity {
                     mFriendReqDatabase.child(mAuth.getUid()).child(user_id).child("request_type").setValue("sent");
                     mFriendReqDatabase.child(user_id).child(mAuth.getUid()).child("request_type").setValue("received");
 
-
-                    // 2nd Method
-                    /*
-                    Map reqestMap = new HashMap();
-
-                    reqestMap.put(mAuth.getUid() + "/" + user_id + "request_type", "sent");
-                    reqestMap.put(user_id + "/" + mAuth.getUid() + "request_type", "received");
-
-                    mFriendDatabase.updateChildren(reqestMap, new DatabaseReference.CompletionListener() {
-                        @Override
-                        public void onComplete(@Nullable DatabaseError error, @NonNull DatabaseReference ref) {
-                            //
-                        }
-                    });
-
-                     */
-
                     mDeclineReqBtn.setVisibility(View.INVISIBLE);
 
                     // CREATE NOTIFICATION IN FIREBASE
@@ -200,13 +186,12 @@ public class ProfileActivity extends AppCompatActivity {
                     String time = calendar.getTime().toString();
 
                     // Add Friend
-                    mFriendDatabase.child(mAuth.getUid()).child(user_id).child("date").setValue(time);
-                    mFriendDatabase.child(user_id).child(mAuth.getUid()).child("date").setValue(time);
+                    mFriendDatabase.child(mAuth.getUid()).child(user_id).child("date").setValue(ServerValue.TIMESTAMP);
+                    mFriendDatabase.child(user_id).child(mAuth.getUid()).child("date").setValue(ServerValue.TIMESTAMP);
 
                     // Removed Requests
                     mFriendReqDatabase.child(mAuth.getUid()).child(user_id).removeValue();
                     mFriendReqDatabase.child(user_id).child(mAuth.getUid()).removeValue();
-
 
                 }
 

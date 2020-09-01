@@ -41,7 +41,7 @@
             android:id="@+id/user_single_status"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="This is default Status"
+            android:text=""
             android:textColor="#432B2B" />
 
     </LinearLayout>

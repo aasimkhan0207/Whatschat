@@ -38,7 +38,6 @@ public class MainActivity extends AppCompatActivity {
 
         mAuth = FirebaseAuth.getInstance();
 
-
         // set app bar
         topAppBar = findViewById(R.id.topAppBar);
 

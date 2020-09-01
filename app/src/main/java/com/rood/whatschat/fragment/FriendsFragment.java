@@ -40,7 +40,11 @@ import com.rood.whatschat.R;
 import com.rood.whatschat.UserActivity;
 import com.rood.whatschat.model.Friend;
 import com.rood.whatschat.model.User;
+import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -114,7 +118,10 @@ public class FriendsFragment extends Fragment {
             @Override
             protected void onBindViewHolder(@NonNull final FriendViewHolder holder, int position, @NonNull Friend model) {
 
-                holder.setDateView(model.getDate());
+                // Date
+                Date date = new Date(Long.parseLong(model.getDate()));
+                String text_date = new SimpleDateFormat("dd MMMM yyyy").format(date);
+                holder.setDateView(text_date); //model.getDate();
 
                 // SET NAME AND IMAGE
                 final String user_id = getRef(position).getKey();
@@ -165,28 +172,6 @@ public class FriendsFragment extends Fragment {
                         dialogBuilder.create();
 
                         dialogBuilder.show();
-
-                        /*
-                        dialogBuilder.setNegativeButton("Profile", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                sendToProfile(user_id);
-                            }
-                        });
-
-                        dialogBuilder.setPositiveButton("Chat", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                Intent chatIntent = new Intent(getContext(), ChatActivity.class);
-                                chatIntent.putExtra("user_id", user_id);
-                                startActivity(chatIntent);
-                            }
-                        });
-
-                        dialogBuilder.show();
-                        */
-
-
 
 
                     }
@@ -271,7 +256,7 @@ public class FriendsFragment extends Fragment {
         }
 
         public void setImageView(String s){
-            Picasso.get().load(s).into(imageView);
+            Picasso.get().load(s).placeholder(R.drawable.harry).networkPolicy(NetworkPolicy.OFFLINE).into(imageView);
         }
 
     }

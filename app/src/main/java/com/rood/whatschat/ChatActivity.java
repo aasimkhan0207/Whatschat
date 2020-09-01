@@ -32,6 +32,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.database.ServerValue;
 import com.rood.whatschat.adapter.MessageAdapter;
 import com.rood.whatschat.model.Message;
 import com.squareup.picasso.Picasso;
@@ -60,6 +61,11 @@ public class ChatActivity extends AppCompatActivity {
     private static final int TOTAL_ITEMS_TO_LOAD = 10;
     private int mCurrentPage = 1;
     private SwipeRefreshLayout mSwipeRefreshLayout;
+    private LinearLayoutManager mLinearLayout;
+
+    private int itemPos;
+    private String mLastKey = "";
+    private String mPrevKey = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,6 +103,44 @@ public class ChatActivity extends AppCompatActivity {
         // Set
         actionBar.setCustomView(custom_action_bar);
 
+        ////////////////////////////   Chat Firebase  /////////////////
+        mDatabase.child("Chat").child(mCurrentUserId).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                if ( !snapshot.hasChild(mChatUserId)){
+
+                    // key : val = content
+                    Map chatAddMap = new HashMap();
+                    chatAddMap.put("timestamp", ServerValue.TIMESTAMP);
+
+                    // path : content-map
+                    Map chatUserMap = new HashMap();
+                    chatUserMap.put("Chat/"+ mCurrentUserId + "/" + mChatUserId, chatAddMap);
+                    chatUserMap.put("Chat/"+ mChatUserId + "/" + mCurrentUserId, chatAddMap);
+
+                    mDatabase.updateChildren(chatUserMap, new DatabaseReference.CompletionListener() {
+                        @Override
+                        public void onComplete(@Nullable DatabaseError error, @NonNull DatabaseReference ref) {
+
+                            if(error != null){
+
+                                Log.d("CHAT_LOG", error.getMessage().toString());
+
+                            }
+
+                        }
+                    });
+                }
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
         //////////////////////////////  MESSAGE RETRIEVAL   /////////////////////////////////////////////////////
 
         /* Recycler View / Adapter   */
@@ -105,7 +149,8 @@ public class ChatActivity extends AppCompatActivity {
         messages = new ArrayList<>();
 
         // Set Layout Manager
-        mMessagesList.setLayoutManager(new LinearLayoutManager(this));
+        mLinearLayout = new LinearLayoutManager(this);
+        mMessagesList.setLayoutManager(mLinearLayout);
 
         // Message Adapter
         messageAdapter = new MessageAdapter(messages);
@@ -180,6 +225,74 @@ public class ChatActivity extends AppCompatActivity {
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
+                // inc. pageCount
+                mCurrentPage++;
+
+                itemPos = 0;
+
+                // Load Message
+                loadMoreMessages();
+
+            }
+        });
+    }
+
+    // called on swipe refresh
+    private void loadMoreMessages() {
+
+        DatabaseReference messageRef = mDatabase.child("Messages").child(mCurrentUserId).child(mChatUserId);
+
+        Query messageQuery = messageRef.orderByKey().endAt(mLastKey).limitToLast(10);
+
+        messageQuery.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+
+                Message message = snapshot.getValue(Message.class);
+                String messageKey = snapshot.getKey();
+
+                if(!mPrevKey.equals(messageKey)){
+
+                    messages.add(itemPos++, message);
+
+                } else {
+
+                    mPrevKey = mLastKey;
+
+                }
+
+                if (itemPos == 1){
+
+                    mLastKey = messageKey;
+                }
+
+                messageAdapter.notifyDataSetChanged();
+
+                // Scroll to Bottom/Last
+                //mMessagesList.scrollToPosition(messages.size()-1);
+
+                mLinearLayout.scrollToPositionWithOffset(10, 0);
+
+                mSwipeRefreshLayout.setRefreshing(false);
+            }
+
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot snapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
 
             }
         });
@@ -188,9 +301,10 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     private void loadMessages() {
+
         DatabaseReference messageRef = mDatabase.child("Messages").child(mCurrentUserId).child(mChatUserId);
 
-        Query messageQuery = messageRef.limitToLast(TOTAL_ITEMS_TO_LOAD);
+        Query messageQuery = messageRef.limitToLast(TOTAL_ITEMS_TO_LOAD * mCurrentPage);
 
         messageQuery.addChildEventListener(new ChildEventListener() {
             @Override
@@ -198,13 +312,24 @@ public class ChatActivity extends AppCompatActivity {
                 // Called when New child is Added wiz new Message (also called once initially for each child node)
                 // Snapshot = new child node
                 Message message = snapshot.getValue(Message.class);
+
+                itemPos++;
+
+                if (itemPos == 1){
+                    String messageKey = snapshot.getKey();
+
+                    mLastKey = messageKey;
+                    mPrevKey = messageKey;
+                }
+
                 messages.add(message);
+
                 messageAdapter.notifyDataSetChanged();
 
-                // Scroll to Bottom
+                // Scroll to Bottom/Last
                 mMessagesList.scrollToPosition(messages.size()-1);
-                mSwipeRefreshLayout.setRefreshing(false);
 
+                mSwipeRefreshLayout.setRefreshing(false);
 
             }
 
@@ -247,7 +372,7 @@ public class ChatActivity extends AppCompatActivity {
 
         // HashMap of the Message
         Map<String, Object> messageMap = new HashMap();
-        messageMap.put("time", time);
+        messageMap.put("time", ServerValue.TIMESTAMP);
         messageMap.put("message", message);
         messageMap.put("from",mCurrentUserId);
 
@@ -264,6 +389,11 @@ public class ChatActivity extends AppCompatActivity {
                     Log.e("CHAT LOG", error.getMessage().toString());
             }
         });
+
+
+        // Update Chat TimeStamp in Firebase
+        mDatabase.child("Chat").child(mCurrentUserId).child(mChatUserId).child("timestamp").setValue(ServerValue.TIMESTAMP);
+        mDatabase.child("Chat").child(mChatUserId).child(mCurrentUserId).child("timestamp").setValue(ServerValue.TIMESTAMP);
 
     }
 
