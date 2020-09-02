@@ -1,5 +1,6 @@
 package com.rood.whatschat.fragment;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -26,6 +27,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.rood.whatschat.ChatActivity;
 import com.rood.whatschat.R;
 import com.rood.whatschat.UserActivity;
 import com.rood.whatschat.model.Conv;
@@ -138,7 +140,7 @@ public class ChatsFragment extends Fragment {
             protected void onBindViewHolder(@NonNull final ConvViewHolder holder, int position, @NonNull Conv model) {
 
                 //SET Last Message
-                String user_id = getRef(position).getKey();
+                final String user_id = getRef(position).getKey();
 
                 Query lastMessageQuery = mMessageDatabase.child(user_id).limitToLast(1);
 
@@ -186,8 +188,16 @@ public class ChatsFragment extends Fragment {
                     }
 
                     @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
+                    public void onCancelled(@NonNull DatabaseError error) { }
+                });
 
+                // Root View OnClick
+                holder.root.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Intent chatIntent = new Intent(getContext(), ChatActivity.class);
+                        chatIntent.putExtra("user_id", user_id);
+                        startActivity(chatIntent);
                     }
                 });
 

@@ -23,11 +23,11 @@ public class SectionsPagerAdapter extends FragmentStateAdapter {
 
         switch (position) {
             case 0:
-                return new RequestsFragment();
-            case 1:
                 return new ChatsFragment();
-            case 2:
+            case 1:
                 return new FriendsFragment();
+            case 2:
+                return new RequestsFragment();
             default:
                 return null;
         }

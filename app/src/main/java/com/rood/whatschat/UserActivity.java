@@ -115,10 +115,6 @@ public class UserActivity extends AppCompatActivity {
                 final String user_dp_url = model.getImage();
                 final String user_name = model.getName();
 
-//                if (user_id.equals(currentUserId)){
-//                    holder.root.setVisibility(View.GONE);
-//                }
-
 
                 holder.setNameView(model.getName());
                 holder.setStatusView(model.getStatus());

@@ -69,15 +69,15 @@ public class MainActivity extends AppCompatActivity {
             public void onConfigureTab(@NonNull TabLayout.Tab tab, int position) {
                 switch (position){
                     case 0:
-                        tab.setText("REQUESTS");
-                        break;
-
-                    case 1:
                         tab.setText("CHATS");
                         break;
 
-                    case 2:
+                    case 1:
                         tab.setText("FRIENDS");
+                        break;
+
+                    case 2:
+                        tab.setText("REQUESTS");
                         break;
                 }
             }

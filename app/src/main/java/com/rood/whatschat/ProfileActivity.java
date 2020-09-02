@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.util.TimeUtils;
 import android.view.View;
 import android.widget.Button;
@@ -15,6 +16,7 @@ import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -50,6 +52,8 @@ public class ProfileActivity extends AppCompatActivity {
     private Button mDeclineReqBtn;
     DateFormat dateFormat;
     Calendar calendar;
+
+    int totalFriendsCount = 0;
 
     String current_state;
 
@@ -153,6 +157,11 @@ public class ProfileActivity extends AppCompatActivity {
             }
         });
 
+        // Hide Button if current user profile
+        if (mAuth.getUid().equals(user_id)){
+            mSendFriendReqBtn.setVisibility(View.INVISIBLE);
+        }
+
         mSendFriendReqBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -236,6 +245,24 @@ public class ProfileActivity extends AppCompatActivity {
                 }
             }
         });
+
+        // SET Total Friends
+        mFriendDatabase.child(user_id).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                totalFriendsCount = (int) snapshot.getChildrenCount();
+                mTotalFriends.setText("Total friends "+ totalFriendsCount);
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+
 
     }
 }

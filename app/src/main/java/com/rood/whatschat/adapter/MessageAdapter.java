@@ -48,17 +48,27 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
 
         // Chane Message View
         if (message.getFrom().equals(currentId)){
-            holder.messageView.setBackgroundResource(R.drawable.message_text_bg_sender);
-            holder.messageView.setTextColor(Color.BLACK);
+
+//            holder.messageView.setBackgroundResource(R.drawable.message_text_bg_sender);
+//            holder.messageView.setTextColor(Color.BLACK);
+
+            holder.hideMessageView();
+            holder.messageViewSender.setVisibility(View.VISIBLE);
 
 
-        } else {
-            holder.messageView.setBackgroundResource(R.drawable.message_text_bg);
-            holder.messageView.setTextColor(Color.WHITE);
+        }
+        else {
+
+//            holder.messageView.setBackgroundResource(R.drawable.message_text_bg);
+//            holder.messageView.setTextColor(Color.WHITE);
+
+            holder.hideMessageViewSender();
+            holder.messageView.setVisibility(View.VISIBLE);
+
         }
 
         holder.setMessageView(message.getMessage());
-        //holder.setTimeView(message.getTime());
+        holder.setMessageViewSender(message.getMessage());
 
     }
 
@@ -73,15 +83,15 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
     public static class MessageViewHolder extends RecyclerView.ViewHolder{
 
         public TextView messageView;
-        //public TextView timeView;
+        public TextView messageViewSender;
+
         public CircleImageView profileImage;
 
         public MessageViewHolder(@NonNull View itemView) {
             super(itemView);
 
             messageView = itemView.findViewById(R.id.message_single_text);
-            profileImage = itemView.findViewById(R.id.message_single_profile);
-            //timeView = itemView.findViewById(R.id.message_single_time);
+            messageViewSender = itemView.findViewById(R.id.message_single_text_2);
 
         }
 
@@ -89,8 +99,17 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
             messageView.setText(s);
         }
 
-        public void setTimeView(String s) {
-            // timeView.setText(s)
+        public void setMessageViewSender(String s) {
+            messageViewSender.setText(s);
         }
+
+        public void hideMessageView(){
+            messageView.setVisibility(View.INVISIBLE);
+        }
+
+        public void hideMessageViewSender(){
+            messageViewSender.setVisibility(View.INVISIBLE);
+        }
+
     }
 }
