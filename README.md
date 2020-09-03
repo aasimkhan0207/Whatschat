@@ -2,7 +2,7 @@
 An Android Realtime Chat application with Firebase backend
 
 ## APK link
-Click to download [Whatschat V1.1](https://drive.google.com/file/d/1LY3gUxcIABec9jhccAMSSrfe1julevTw/view?usp=sharing).
+Click to download [Whatschat v1.1](https://drive.google.com/file/d/1LY3gUxcIABec9jhccAMSSrfe1julevTw/view?usp=sharing).
 
 ## Screenshots
 
