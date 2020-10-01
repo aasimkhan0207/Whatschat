@@ -54,6 +54,7 @@ public class ProfileActivity extends AppCompatActivity {
     Calendar calendar;
 
     int totalFriendsCount = 0;
+    int request = 0;
 
     String current_state;
 
